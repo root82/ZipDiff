@@ -1,7 +1,10 @@
 import java.io.File;
+import java.util.Iterator;
+
 import org.apache.commons.cli.*;
 
-
+import zipdiff.output.Builder;
+import zipdiff.output.HtmlBuilder;
 
 public class CommonTest {
 
@@ -73,6 +76,14 @@ public class CommonTest {
         }
 
     }
+
+    private static void writeOutputFile(String filename, Diffs d)
+    	throws java.io.IOException{
+    	Builder builder = null;
+    	builder = new HtmlBuilder();
+    	//builder.build(filename, d);
+    	
+    }
     
 	/**
 	 * 
@@ -81,6 +92,7 @@ public class CommonTest {
 	 * @param args The command line parameters
 	 * 
 	 */
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 
 		CommandLineParser parser = new GnuParser();
@@ -108,8 +120,25 @@ public class CommonTest {
             
             Diffs d = cals.getDifferences();
             
-            System.out.println(d);
+            if (d.hasDifferences()){
+            	if (line.hasOption(OPTION_VERBOSE)) {
+            		System.out.println(d);
+            		System.out.println(d.getFilename1() + " and " + d.getFilename2() + " are different.");
+            	}
+            	if (line.hasOption(OPTION_EXIT_WITH_ERROR_ON_DIFF)) {
+            		System.exit(EXITCODE_DIFF);
+            	}
+            } else {
+            	System.out.println("No differences found.");
+            }
+            //System.out.println(d);
             
+            Iterator iter = d.getChanged().keySet().iterator();
+            while(iter.hasNext()){
+            	System.out.println(iter.next());
+            }
+            
+            writeOutputFile("a.html", d);
 		} catch (ParseException e) {
             System.err.println(e.getMessage());
             new HelpFormatter().printHelp("CommonTest [options] ", options);
