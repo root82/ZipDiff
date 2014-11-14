@@ -5,26 +5,26 @@ import java.util.zip.ZipEntry;
 
 @SuppressWarnings("rawtypes")
 public class Diffs {
-    private String filename1;
-    private String filename2;
+    private String compareFileName;
+    private String withFileName;
     
     private final Map removed = new HashMap();
     private final Map added = new HashMap();
     private final Map changed = new HashMap();
     private final Map ignored = new HashMap();
     
-	public String getFilename1() {
-		return filename1;
+	public String getCompareFileName() {
+		return compareFileName;
 	}
-	public String getFilename2() {
-		return filename2;
+	public String getWithFileName() {
+		return withFileName;
 	}
 
-	public void setFilename1(String filename1) {
-		this.filename1 = filename1;
+	public void setCompareFileName(String compareFileName) {
+		this.compareFileName = compareFileName;
 	}
-	public void setFilename2(String filename2) {
-		this.filename2 = filename2;
+	public void setWithFileName(String withFileName) {
+		this.withFileName = withFileName;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,11 +74,11 @@ public class Diffs {
 		StringBuffer sb = new StringBuffer();
 		
 		if (added.size() == 1){
-			sb.append("1 file was");
+			sb.append("1 file is");
 		} else {
-			sb.append(added.size() + " files were");
+			sb.append(added.size() + " files are");
 		}
-		sb.append(" added to " + this.getFilename2() + "\n");
+		sb.append(" added to " + this.getCompareFileName() + "\n");
 		
 		Iterator iter = added.keySet().iterator();
 		while(iter.hasNext()){
@@ -87,11 +87,11 @@ public class Diffs {
 		}
 		
 		if (removed.size() == 1){
-			sb.append("1 file was");
+			sb.append("1 file is");
 		} else {
-			sb.append(removed.size() + " files were");
+			sb.append(removed.size() + " files are");
 		}
-		sb.append(" removed to " + this.getFilename2() + "\n");
+		sb.append(" removed from " + this.getCompareFileName() + "\n");
 		
 		iter = removed.keySet().iterator();
 		while(iter.hasNext()){
@@ -100,11 +100,11 @@ public class Diffs {
 		}
 		
 		if (changed.size() ==1){
-			sb.append("1 file was");
+			sb.append("1 file is");
 		} else {
-			sb.append(changed.size() + " files were");
+			sb.append(changed.size() + " files are");
 		}
-		sb.append(" changed to " + this.getFilename2() + "\n");
+		sb.append(" changed in " + this.getCompareFileName() + "\n");
 
 		iter = getChanged().keySet().iterator();
 		while(iter.hasNext()){

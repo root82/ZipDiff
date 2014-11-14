@@ -10,49 +10,39 @@ public class CommonTest {
 
     private static final int EXITCODE_ERROR = 2;
 	private static final int EXITCODE_DIFF = 1;
-    private static final String OPTION_OUTPUT_FILE = "outputfile";
-    private static final String OPTION_FILE1 = "file1";
-    private static final String OPTION_FILE2 = "file2";
+    private static final String OPTION_OUTPUT_FILE[] = {"o","outputfile"};
+    private static final String OPTION_FILE1[] = {"c", "compare"};
+    private static final String OPTION_FILE2[] = {"w", "with"};
     private static final String OPTION_EXIT_WITH_ERROR_ON_DIFF = "exitwitherrorondifference";
-	private static final String OPTION_VERBOSE = "verbose";
+	private static final String OPTION_VERBOSE[] = {"v","verbose"};
 	private static final Options options;
 	
     // static initializer
     static {
         options = new Options();
 
-        Option file1 = new Option(OPTION_FILE1, OPTION_FILE1, true, "<filename> first file to compare");
-        file1.setRequired(true);
+        Option compareFile = new Option(OPTION_FILE1[0], OPTION_FILE1[1], true, "<filename> file to compare");
+        compareFile.setRequired(true);
 
-        Option file2 = new Option(OPTION_FILE2, OPTION_FILE2, true, "<filename> second file to compare");
-        file2.setRequired(true);
+        Option withFile = new Option(OPTION_FILE2[0], OPTION_FILE2[1], true, "<filename> file to compare with");
+        withFile.setRequired(true);
 
-        Option outputFileOption =
-        	new Option(
-        			OPTION_OUTPUT_FILE,
-					OPTION_OUTPUT_FILE,
-					true,
-					"output filename");
+        Option outputFileOption = new Option(OPTION_OUTPUT_FILE[0], OPTION_OUTPUT_FILE[1], true, "output filename");
         outputFileOption.setRequired(false);
         
         
-		Option exitWithError = 
+		/*Option exitWithError = 
 			new Option(
 				OPTION_EXIT_WITH_ERROR_ON_DIFF,
 				OPTION_EXIT_WITH_ERROR_ON_DIFF,
 				false,
-				"if a difference is found then exit with error " + EXITCODE_DIFF);
+				"if a difference is found then exit with error " + EXITCODE_DIFF);*/
 				
-		Option verboseOption = 
-			new Option(
-				OPTION_VERBOSE,
-				OPTION_VERBOSE,
-				false,
-				"verbose mode");
+		Option verboseOption = new Option(OPTION_VERBOSE[0], OPTION_VERBOSE[1], false, "verbose mode");
 		
-        options.addOption(file1);
-        options.addOption(file2);
-        options.addOption(exitWithError);
+        options.addOption(compareFile);
+        options.addOption(withFile);
+        //options.addOption(exitWithError);
         options.addOption(verboseOption);
         options.addOption(outputFileOption);
     }
@@ -77,13 +67,6 @@ public class CommonTest {
 
     }
 
-    private static void writeOutputFile(String filename, Diffs d)
-    	throws java.io.IOException{
-    	Builder builder = null;
-    	builder = new HtmlBuilder();
-    	//builder.build(filename, d);
-    	
-    }
     
 	/**
 	 * 
@@ -103,8 +86,8 @@ public class CommonTest {
             String filename1 = null;
             String filename2 = null;
             
-            filename1 = line.getOptionValue(OPTION_FILE1);
-            filename2 = line.getOptionValue(OPTION_FILE2);
+            filename1 = line.getOptionValue(OPTION_FILE1[0]);
+            filename2 = line.getOptionValue(OPTION_FILE2[0]);
 
             File f1 = new File(filename1);
             File f2 = new File(filename2);
@@ -121,9 +104,9 @@ public class CommonTest {
             Diffs d = cals.getDifferences();
             
             if (d.hasDifferences()){
-            	if (line.hasOption(OPTION_VERBOSE)) {
+            	if (line.hasOption(OPTION_VERBOSE[0])) {
             		System.out.println(d);
-            		System.out.println(d.getFilename1() + " and " + d.getFilename2() + " are different.");
+            		System.out.println(d.getCompareFileName() + " and " + d.getWithFileName() + " are different.");
             	}
             	if (line.hasOption(OPTION_EXIT_WITH_ERROR_ON_DIFF)) {
             		System.exit(EXITCODE_DIFF);
@@ -131,14 +114,9 @@ public class CommonTest {
             } else {
             	System.out.println("No differences found.");
             }
-            //System.out.println(d);
+            System.out.println(d);
             
-            Iterator iter = d.getChanged().keySet().iterator();
-            while(iter.hasNext()){
-            	System.out.println(iter.next());
-            }
             
-            writeOutputFile("a.html", d);
 		} catch (ParseException e) {
             System.err.println(e.getMessage());
             new HelpFormatter().printHelp("CommonTest [options] ", options);

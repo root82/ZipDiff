@@ -16,8 +16,8 @@ import org.apache.tools.ant.util.StringUtils;
 
 public class DiffCals {
 
-    private ZipFile file1;
-    private ZipFile file2;
+    private ZipFile compareFile;
+    private ZipFile withFile;
     
 	/**
 	 * Constructor taking 2 filenames to compare
@@ -39,8 +39,8 @@ public class DiffCals {
 	 * Constructor taking 2 ZipFiles to compare
 	 */
 	public DiffCals(ZipFile zf1, ZipFile zf2) {
-		file1 = zf1;
-		file2 = zf2;
+		compareFile = zf1;
+		withFile = zf2;
 	}
 	protected boolean ignoreThisFile(String filepath, String filename){
 	
@@ -53,9 +53,7 @@ public class DiffCals {
 			String uppercaseName = filename.toUpperCase();
 			if (uppercaseName.endsWith("TIBCO.XML") 
 					|| uppercaseName.endsWith(".SAR")
-					|| uppercaseName.endsWith(".PAR")
-					|| uppercaseName.endsWith(".PAR")
-					|| uppercaseName.endsWith(".XYZ")){
+					|| uppercaseName.endsWith(".PAR")){
 				result = true;
 			} else {
 				result = false;
@@ -108,19 +106,16 @@ public class DiffCals {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void processZipEntry(String prefix, ZipEntry zipEntry, InputStream is, Map zipEntryMap) throws java.io.IOException{
-		if (ignoreThisFile(prefix,zipEntry.getName())){
-			//todo
-		} else{
-			String name = prefix + zipEntry.getName();
-			
-			if(zipEntry.isDirectory()){
-				zipEntryMap.put(name, zipEntry);
-			} else if(isZipFile(name)){
-				processEmbeddedZipFile(zipEntry.getName() + "/", is, zipEntryMap);
-				zipEntryMap.put(name, zipEntry);
-			} else {
-				zipEntryMap.put(name, zipEntry);
-			}
+
+		String name = prefix + zipEntry.getName();
+		
+		if(zipEntry.isDirectory()){
+			zipEntryMap.put(name, zipEntry);
+		} else if(isZipFile(name)){
+			processEmbeddedZipFile(zipEntry.getName() + "/", is, zipEntryMap);
+			zipEntryMap.put(name, zipEntry);
+		} else {
+			zipEntryMap.put(name, zipEntry);
 		}
 	}
 	
@@ -152,43 +147,46 @@ public class DiffCals {
 	}
 	
 	
-	protected boolean entriesMatch(ZipEntry entry1, ZipEntry entry2){
+	protected boolean entriesMatch(ZipEntry compareZipEntry, ZipEntry withZipEntry){
 		boolean result;
 		
-		result = 
-				(entry1.isDirectory() == entry2.isDirectory())
-				&& (entry1.getSize() == entry2.getSize())
-				&& (entry1.getCompressedSize() == entry2.getCompressedSize())
-//				&& (entry1.getCrc() == entry2.getCrc())
-				&& (entry1.getName().equals(entry2.getName()));
+		result = (compareZipEntry.isDirectory() == withZipEntry.isDirectory())
+				&& (compareZipEntry.getSize() == withZipEntry.getSize())
+				&& (compareZipEntry.getCompressedSize() == withZipEntry.getCompressedSize())
+				&& (compareZipEntry.getCrc() == withZipEntry.getCrc())
+				&& (compareZipEntry.getName().equals(withZipEntry.getName()));
 		return result;
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Diffs findDifferences(Map m1, Map m2){
+	protected Diffs findDifferences(Map compareMap, Map withMap){
 		Diffs d = new Diffs();
 		
-		Set names1 = m1.keySet();
-		Set names2 = m2.keySet();
+		Set compareNamesSet = compareMap.keySet();
+		Set withNamesSet = withMap.keySet();
 		
 		Set allNames = new HashSet();
-		allNames.addAll(names1);
-		allNames.addAll(names2);
+		allNames.addAll(compareNamesSet);
+		allNames.addAll(withNamesSet);
 		
 		Iterator iterAllNames = allNames.iterator();
 		
 		while (iterAllNames.hasNext()){
 			String name = (String) iterAllNames.next();
 			
-			if (names1.contains(name) && (!names2.contains(name))){
-				d.fileRemoved(name, (ZipEntry) m1.get(name)); 
-			} else if (names2.contains(name) && (!names1.contains(name))){
-				d.fileAdded(name, (ZipEntry) m2.get(name));
-			} else if (names1.contains(name) && names2.contains(name)){
-				ZipEntry entry1 = (ZipEntry) m1.get(name);
-				ZipEntry entry2 = (ZipEntry) m2.get(name);
-				if (!entriesMatch(entry1, entry2)){
-					d.fileChanged(name, entry1, entry2);
+			if (ignoreThisFile("",name)){
+				// todo
+			} else {
+				if (compareNamesSet.contains(name) && (!withNamesSet.contains(name))){
+					d.fileAdded(name, (ZipEntry) compareMap.get(name)); 
+				} else if (withNamesSet.contains(name) && (!compareNamesSet.contains(name))){
+					d.fileRemoved(name, (ZipEntry) withMap.get(name));
+				} else if (compareNamesSet.contains(name) && withNamesSet.contains(name)){
+					ZipEntry compareZipEntry = (ZipEntry) compareMap.get(name);
+					ZipEntry withZipEntry = (ZipEntry) withMap.get(name);
+					if (!entriesMatch(compareZipEntry, withZipEntry)){
+						d.fileChanged(name, compareZipEntry, withZipEntry);
+					}
 				}
 			}
 		}
@@ -197,18 +195,18 @@ public class DiffCals {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	protected Diffs calculateDifferences(ZipFile zf1, ZipFile zf2) throws java.io.IOException{
+	protected Diffs calculateDifferences(ZipFile compareZipFile, ZipFile withZipFile) throws java.io.IOException{
 
-		Map map1 = buildZipEntryMap(zf1),
-				map2 = buildZipEntryMap(zf2);
+		Map compareMap = buildZipEntryMap(compareZipFile),
+				withMap = buildZipEntryMap(withZipFile);
 		
-		return findDifferences(map1, map2);
+		return findDifferences(compareMap, withMap);
 	}
 	
 	public Diffs getDifferences() throws java.io.IOException{
-		Diffs d = calculateDifferences(file1, file2);
-		d.setFilename1(file1.getName());
-		d.setFilename2(file2.getName());
+		Diffs d = calculateDifferences(compareFile, withFile);
+		d.setCompareFileName(compareFile.getName());
+		d.setWithFileName(withFile.getName());
 		
 		return d;
 	}
