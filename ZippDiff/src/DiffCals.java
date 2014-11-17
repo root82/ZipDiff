@@ -146,6 +146,15 @@ public class DiffCals {
 		return zipEntryMap;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
+	public Map[] buildZipEntryMap() throws java.io.IOException{
+		Map[] zipEntryMaps = new HashMap[2];
+		
+		zipEntryMaps[0] = buildZipEntryMap(compareFile);
+		zipEntryMaps[1] = buildZipEntryMap(withFile);
+		
+		return zipEntryMaps;
+	}
 	
 	protected boolean entriesMatch(ZipEntry compareZipEntry, ZipEntry withZipEntry){
 		boolean result;
