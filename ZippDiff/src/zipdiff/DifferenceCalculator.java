@@ -23,7 +23,7 @@ public class DifferenceCalculator {
     private ZipFile file1;
     private ZipFile file2;
     private boolean ignoreTimestamps = false;
-    private boolean ignoreCVSFiles = false;
+    //private boolean ignoreCVSFiles = false;
     private boolean compareCRCValues = true;
     private Pattern filesToIgnorePattern;
     private boolean bVerbose = false;
@@ -107,9 +107,9 @@ public class DifferenceCalculator {
         if (filename == null) {
             return false;
         }
-        else if (isCVSFile(filepath, filename) && (ignoreCVSFiles() ) ) {
+        /*else if (isCVSFile(filepath, filename) && (ignoreCVSFiles() ) ) {
         	return true;
-        } else if (filesToIgnorePattern == null) {
+        }*/ else if (filesToIgnorePattern == null) {
             return false;
         } else {
             Matcher m = filesToIgnorePattern.matcher(filename);
@@ -348,7 +348,7 @@ public class DifferenceCalculator {
         return ignoreTimestamps;
     }
 
-    public boolean ignoreCVSFiles()
+    /*public boolean ignoreCVSFiles()
     {
     	return ignoreCVSFiles;
     }
@@ -356,7 +356,7 @@ public class DifferenceCalculator {
     public void setIgnoreCVSFiles(boolean b)
     {
     	ignoreCVSFiles = b;
-    }
+    }*/
     
     /**
      * 

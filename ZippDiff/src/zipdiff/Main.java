@@ -180,11 +180,11 @@ public class Main {
                 calc.setCompareCRCValues(false);
             }
 
-            if (line.hasOption(OPTION_IGNORE_CVS_FILES)) {
+            /*if (line.hasOption(OPTION_IGNORE_CVS_FILES)) {
             	calc.setIgnoreCVSFiles(true);
             } else {
             	calc.setIgnoreCVSFiles(false);
-            }
+            }*/
             
             if (line.hasOption(OPTION_COMPARE_TIMESTAMPS)) {
                 calc.setIgnoreTimestamps(false);
