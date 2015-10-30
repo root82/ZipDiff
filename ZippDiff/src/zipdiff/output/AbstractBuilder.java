@@ -4,8 +4,9 @@
  */
 package zipdiff.output;
 
-import zipdiff.Differences;
 import java.io.*;
+
+import earcompare.Differences;
 
 /**
  * 

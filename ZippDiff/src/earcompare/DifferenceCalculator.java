@@ -1,4 +1,4 @@
-package zipdiff;
+package earcompare;
 
 import java.util.*;
 import java.util.zip.ZipInputStream;

@@ -4,11 +4,12 @@
  */
 package zipdiff.output;
 
-import zipdiff.Differences;
 import java.io.PrintWriter;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.Iterator;
+
+import earcompare.Differences;
 
 /**
  * 

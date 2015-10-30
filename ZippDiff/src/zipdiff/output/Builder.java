@@ -6,7 +6,8 @@
 package zipdiff.output;
 
 import java.io.OutputStream;
-import zipdiff.Differences;
+
+import earcompare.Differences;
 
 /**
  * 

@@ -5,11 +5,13 @@
 
 package zipdiff.ant;
 
-import zipdiff.DifferenceCalculator;
-import zipdiff.Differences;
 import zipdiff.output.*;
+
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
+
+import earcompare.DifferenceCalculator;
+import earcompare.Differences;
 
 /**
  * 
