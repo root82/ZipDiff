@@ -109,7 +109,7 @@ public class ZipDiffTask extends Task {
             calculator = new DifferenceCalculator(filename1, filename2);
             calculator.setCompareCRCValues(getCompareCRCValues());
             calculator.setIgnoreTimestamps(getIgnoreTimestamps());
-            calculator.setIgnoreCVSFiles(getIgnoreCVSFiles());
+            //calculator.setIgnoreCVSFiles(getIgnoreCVSFiles());
 
             // todo : calculator.setFilenamesToIgnore(patterns);
 
